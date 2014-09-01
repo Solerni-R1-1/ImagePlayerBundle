@@ -16,7 +16,7 @@
         <div id="image-player" class="carousel slide" style="width:100%">
             <div class="carousel-inner">
                 {% for img in images %}
-                    <div class="item{% if img.getResourceNode().getId() ==  _resource.getResourceNode().getId() %} active{% endif %}" data-name="{{ img.getResourceNode().getName() }}"  data-id="{{ img.getResourceNode().getId() }}">
+                    <div class="item{% if img.getResourceNode().getId() ==  _resource.getResourceNode().getId() %} active{% endif %}" data-name="{{ img.getResourceNode().getName() }}"  data-id="{{ img.getResourceNode().getId() }}" data-exportable="{{ img.isExportable(app.security) }}">
                         <img src="{{ path ("claro_image", {"node": img.getResourceNode.getId()}) }}" width="100%">
                     </div>
                 {% endfor %}
@@ -85,9 +85,15 @@
             $('#image-player').on('slid.bs.carousel', function () {
                 var title = $(".item.active", this).data('name');
                 var id = $(".item.active", this).data('id');
+                var exportable = $(".item.active", this).data('exportable');
                 $('.panel-heading .panel-title').html(title);
                 $('.breadcrumb li').last().html(title);
                 $('.panel-footer .btn.btn-primary').attr('href', $('.panel-footer .btn.btn-primary').attr('href').replace(/(ids\[\]=)[^\&]+/, '$1' + id));
+                if (exportable) {
+                	$('.panel-footer .btn.btn-primary').removeClass('hidden');
+                } else {
+                	$('.panel-footer .btn.btn-primary').addClass('hidden');
+                }
             });
         })();
     </script>

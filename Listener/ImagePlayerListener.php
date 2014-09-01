@@ -14,6 +14,7 @@ namespace Claroline\ImagePlayerBundle\Listener;
 use Claroline\CoreBundle\Event\PlayFileEvent;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpFoundation\Response;
+use Claroline\CoreBundle\Library\Resource\ResourceCollection;
 
 class ImagePlayerListener extends ContainerAware
 {
@@ -28,6 +29,10 @@ class ImagePlayerListener extends ContainerAware
         $path = $this->container->getParameter('claroline.param.files_directory')
             . DIRECTORY_SEPARATOR
             . $event->getResource()->getHashName();
+
+        $sc = $this->container->get('security.context');
+        $isExportable = $event->getResource()->isExportable($sc);
+
         $content = $this->container->get('templating')->render(
             'ClarolineImagePlayerBundle::image.html.twig',
             array(
@@ -35,7 +40,8 @@ class ImagePlayerListener extends ContainerAware
                 'path' => $path,
                 'image' => $event->getResource(),
                 '_resource' => $event->getResource(),
-                'images' => $images
+                'images' => $images,
+            	'isExportable' => $isExportable
             )
         );
 
