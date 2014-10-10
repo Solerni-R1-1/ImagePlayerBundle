@@ -16,7 +16,7 @@
         <div id="image-player" class="carousel slide" style="width:100%">
             <div class="carousel-inner">
                 {% for img in images %}
-                    <div class="item{% if img.getResourceNode().getId() ==  _resource.getResourceNode().getId() %} active{% endif %}" data-name="{{ img.getResourceNode().getName() }}"  data-id="{{ img.getResourceNode().getId() }}" data-exportable="{{ img.isExportable(app.security) }}">
+                    <div class="item{% if img.getResourceNode().getId() ==  _resource.getResourceNode().getId() %} active{% endif %}" data-name="{{ img.getResourceNode().getName() }}"  data-id="{{ img.getResourceNode().getId() }}" {% if img.isExportable(app.security) %}data-exportable="{{ img.isExportable(app.security) }}"{% endif %}>
                         <img src="{{ path ("claro_image", {"node": img.getResourceNode.getId()}) }}" width="100%">
                     </div>
                 {% endfor %}
@@ -36,7 +36,7 @@
         </div>
     </div>
     <div class="panel-footer">
-        <a class="btn btn-primary" href="{{ path('claro_resource_download') }}?ids[]={{ _resource.getResourceNode().getId() }}">
+        <a class="btn btn-primary hidden" href="{{ path('claro_resource_download') }}?ids[]={{ _resource.getResourceNode().getId() }}">
             <i class="icon-download"></i> {{ 'download'|trans({}, 'platform') }}
         </a>
     </div>
@@ -82,18 +82,26 @@
         (function() {
             "use strict";
 
-            $('#image-player').on('slid.bs.carousel', function () {
-                var title = $(".item.active", this).data('name');
-                var id = $(".item.active", this).data('id');
-                var exportable = $(".item.active", this).data('exportable');
-                $('.panel-heading .panel-title').html(title);
-                $('.breadcrumb li').last().html(title);
-                $('.panel-footer .btn.btn-primary').attr('href', $('.panel-footer .btn.btn-primary').attr('href').replace(/(ids\[\]=)[^\&]+/, '$1' + id));
+            function displayButton(exportable) {
+                
                 if (exportable) {
                 	$('.panel-footer .btn.btn-primary').removeClass('hidden');
                 } else {
                 	$('.panel-footer .btn.btn-primary').addClass('hidden');
                 }
+            }
+            
+            var exportable = $(".item.active").data('exportable');
+            console.log($(".item.active").data('exportable'));
+            displayButton(exportable);
+
+            $('#image-player').on('slid.bs.carousel', function () {
+                var title = $(".item.active", this).data('name');
+                var id = $(".item.active", this).data('id');
+                $('.panel-heading .panel-title').html(title);
+                $('.breadcrumb li').last().html(title);
+                $('.panel-footer .btn.btn-primary').attr('href', $('.panel-footer .btn.btn-primary').attr('href').replace(/(ids\[\]=)[^\&]+/, '$1' + id));
+                displayButton( $( ".item.active", this).data('exportable' ) );
             });
         })();
     </script>
